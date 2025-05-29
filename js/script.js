@@ -1,14 +1,16 @@
-$('#search-button').on('click', function () {
+function searchMovies(){
+    $('#Movie-list').html('');
 
     $.ajax({
         url: 'http://omdbapi.com',
         type: 'get',
         dataType: 'json',
-        data: {
-            'apikey' :'2b6bf739',
+        data:{
+            'apikey':'2b6bf739',
             's': $('#search-input').val()
+            
         },
-        success: function() {
+        success: function (result) {
             if(result.Response == "True") {
                 let movies = result.Search;
 
@@ -23,16 +25,66 @@ $('#search-button').on('click', function () {
                     </div>
                   </div>`);
 
+
                });
-                $('#search-input').val('');
-            
+
+               $('#search-input').val('');
+
+
             } else {
-                $('movie-list').html(`
-                    <div class="col">
-                        <h1 class="text-center">`+ result.Error +`</h1>
-                    </div>
-                    `)
+                 $('#Movie-list').html(`<div class="col-12 text-center">
+                 <h1 class = "text-center">+ result.Error +</h1></div>
+                 `); 
             }
         }
+
     });
+}
+$('#search-button').on('click', function (){
+    searchMovies();
+   
+
+});
+
+$('#search-input').on('keyup', function (e){
+    if(e.keyCode === 13){
+        searchMovies();
+    }
+});
+
+$('#Movie-list').on('click','.see-detail', function (){
+    console.log($(this).data('id'));
+
+    $.ajax({
+        url:'https://omdbapi.com',
+        dataType:'json',
+        data: {
+            'apikey':'2b6bf739',
+            'i':$(this).data('id')
+        },
+        success: function(movie){
+            if(movie.Response === "True"){
+
+                $('.modal-body').html(`<div class="container-fluid">
+                <div class="row">
+                <div class="col-md-4">
+                <img src="`+ movie.Poster +`"class="img-fluid">
+                </div>
+                <div class="col-md-8">
+                <ul class="list-group">
+                <li class="list-group-item"><h3> `+ movie.Title +`</h3></li>
+                <li class="list-group-item">Released : `+ movie.Released +`</li>
+                <li class="list-group-item">Director: `+ movie.Director +`</li>
+                <li class="list-group-item">Actors: `+ movie.Actors +`</li>
+                
+        
+                </ul>
+                </div>
+                </div>
+                `);
+            
+            }
+
+        }
+    })
 });
